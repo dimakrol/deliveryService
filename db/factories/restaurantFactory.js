@@ -1,5 +1,8 @@
 const faker = require('faker');
 const models = require('../../app/models');
+const {DISTRICTS} = require('../../config/constants');
+const {Restaurant} = require('../../app/models');
+
 /**
  * Generate an object which container attributes needed
  * to successfully create a user instance.
@@ -10,9 +13,11 @@ const models = require('../../app/models');
  */
 const data = async (props = {}) => {
   const defaultProps = {
-    email: faker.internet.email(),
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
+    title: faker.company.companyName(),
+    district: faker.random.arrayElement(
+      Object.values(DISTRICTS)
+    ),
+    address: faker.address.streetAddress(),
   };
 
   return Object.assign({}, defaultProps, props);
@@ -25,4 +30,4 @@ const data = async (props = {}) => {
  * @return {Object}       A user instance
  */
 module.exports = async (props = {}) =>
-  models.User.create(await data(props));
+  models.Restaurant.create(await data(props));
