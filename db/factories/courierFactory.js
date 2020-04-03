@@ -15,11 +15,9 @@ const data = async (props = {}) => {
     email: faker.internet.email(),
     password: faker.internet.password(),
     phone: faker.phone.phoneNumber(),
-    status: faker.random.arrayElement([
-      COURIER_STATUSES.INACTIVE,
-      COURIER_STATUSES.ACTIVE,
-      COURIER_STATUSES.DELIVERS
-    ]),
+    status: faker.random.arrayElement(
+      Object.values(COURIER_STATUSES)
+    ),
     currentDistrict: faker.random.arrayElement(
       Object.values(DISTRICTS)
     )
