@@ -10,8 +10,8 @@ module.exports = (sequelize, DataTypes) => {
     status: DataTypes.ENUM(COURIER_STATUSES.ACTIVE, COURIER_STATUSES.INACTIVE, COURIER_STATUSES.DELIVERS),
     currentDistrict: DataTypes.STRING
   }, {});
-  Courier.associate = function(models) {
-    // associations can be defined here
+  Courier.associate = ({Order}) => {
+    Courier.hasMany(Order, {as: 'orders'});
   };
   return Courier;
 };

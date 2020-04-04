@@ -11,12 +11,14 @@ module.exports = (sequelize, DataTypes) => {
     ),
     district: DataTypes.STRING,
     address: DataTypes.STRING,
-    deliveryTime: DataTypes.DATE,
+    deliveredAt: DataTypes.DATE,
     deliveryCost: DataTypes.FLOAT,
     totalPrice: DataTypes.FLOAT
   }, {});
   Order.associate = function(models) {
-    // associations can be defined here
+    Order.belongsTo(models.Customer, {as: 'customer'});
+    Order.belongsTo(models.Courier, {as: 'courier'});
+    Order.belongsTo(models.Restaurant, {as: 'restaurant'});
   };
   return Order;
 };
