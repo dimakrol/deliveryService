@@ -4,11 +4,13 @@ const expect = chai.expect;
 const faker = require('faker');
 const truncate = require('../truncate');
 const restaurantFactory = require('../../db/factories/restaurantFactory');
+const customerFactory = require('../../db/factories/customerFactory');
+const orderFactory = require('../../db/factories/orderFactory');
 const times = require('../times');
 const app = require('../../app');
 const {defaultLimit, apiV1} = require('../../config/constants')
 const {Restaurant} = require('../../app/models');
-const {COURIER_STATUSES, DISTRICTS} = require('../../config/constants');
+const {DISTRICTS} = require('../../config/constants');
 
 chai.use(chaiHttp);
 
@@ -161,6 +163,24 @@ describe('restaurant resource', () => {
       const total = await Restaurant.count();
       expect(res).to.have.status(204);
       expect(total).to.equal(0)
+    });
+
+    it('should not delete restaurant', async () => {
+      const restaurant = await restaurantFactory();
+      const customer = await customerFactory();
+      await orderFactory({
+        CustomerId: customer.id,
+        RestaurantId: restaurant.id,
+      });
+
+      const res = await chai
+        .request(app)
+        .delete(`${resourceEndpoint}/${restaurant.id}`)
+        .send();
+
+      const total = await Restaurant.count();
+      expect(res).to.have.status(409);
+      expect(total).to.equal(1)
     });
 
     it('should get validation error', async () => {

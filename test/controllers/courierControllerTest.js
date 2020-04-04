@@ -3,6 +3,9 @@ const chai = require('chai');
 const expect = chai.expect;
 const faker = require('faker');
 const truncate = require('../truncate');
+const orderFactory = require('../../db/factories/orderFactory');
+const customerFactory = require('../../db/factories/customerFactory');
+const restaurantFactory = require('../../db/factories/restaurantFactory');
 const courierFactory = require('../../db/factories/courierFactory');
 const times = require('../times');
 const app = require('../../app');
@@ -199,7 +202,7 @@ describe('courier resource', () => {
         });
       expect(res).to.have.status(404);
     });
-  })
+  });
 
   describe('delete', () => {
     it('should delete courier', async () => {
@@ -213,6 +216,27 @@ describe('courier resource', () => {
       const total = await Courier.count();
       expect(res).to.have.status(204);
       expect(total).to.equal(0)
+    });
+
+    it('should not delete courier', async () => {
+      const courier = await courierFactory();
+      const restaurant = await restaurantFactory();
+      const customer = await customerFactory();
+      await orderFactory({
+        CustomerId: customer.id,
+        RestaurantId: restaurant.id,
+        CourierId: courier.id
+      });
+
+
+      const res = await chai
+        .request(app)
+        .delete(`${resourceEndpoint}/${courier.id}`)
+        .send();
+
+      const total = await Courier.count();
+      expect(res).to.have.status(409);
+      expect(total).to.equal(1)
     });
 
     it('should get validation error', async () => {

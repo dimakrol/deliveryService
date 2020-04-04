@@ -1,4 +1,4 @@
-const { Courier } = require('../../models');
+const { Courier, Order } = require('../../models');
 const { defaultLimit } = require('../../../config/constants');
 const bcrypt = require('bcrypt');
 
@@ -47,9 +47,15 @@ exports.updateAction = async (req, res) => {
 
 exports.deleteAction = async (req, res) => {
   const courier = await Courier.findByPk(req.params.id);
+
   if(!courier) {
     return res.status(404).send();
   }
+
+  if(await Order.count({where: {CourierId: courier.id}})) {
+    return res.status(409).json({message: "Can't delete courier with orders!"})
+  }
+
   await courier.destroy();
   res.status(204).send();
 };

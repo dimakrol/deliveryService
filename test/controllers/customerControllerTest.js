@@ -4,6 +4,8 @@ const expect = chai.expect;
 const faker = require('faker');
 const truncate = require('../truncate');
 const customerFactory = require('../../db/factories/customerFactory');
+const orderFactory = require('../../db/factories/orderFactory');
+const restaurantFactory = require('../../db/factories/restaurantFactory');
 const times = require('../times');
 const app = require('../../app');
 const {defaultLimit, apiV1} = require('../../config/constants')
@@ -128,117 +130,137 @@ describe('customer resource', () => {
     });
   });
 
-  // describe('update', () => {
-  //   const name = faker.name.findName();
-  //   const email = faker.internet.email();
-  //   const phone = faker.phone.phoneNumber();
-  //   const status = COURIER_STATUSES.INACTIVE;
-  //
-  //   it('should update courier', async () => {
-  //     const courier = await courierFactory();
-  //
-  //     const res = await chai
-  //       .request(app)
-  //       .put(`${resourceEndpoint}/${courier.id}`)
-  //       .send({
-  //         name,
-  //         email,
-  //         currentDistrict: DISTRICTS.HOLOSIIVSKYI,
-  //         phone,
-  //         status
-  //       });
-  //
-  //     const updatedCourier = await Courier.findByPk(courier.id);
-  //     expect(res).to.have.status(200);
-  //
-  //     expect(updatedCourier.name).to.equal(name);
-  //     expect(updatedCourier.email).to.equal(email);
-  //     expect(updatedCourier.phone).to.equal(phone);
-  //     expect(updatedCourier.status).to.equal(status);
-  //     expect(updatedCourier.currentDistrict).to.equals(DISTRICTS.HOLOSIIVSKYI);
-  //   });
-  //
-  //   it('should get validation errors', async () => {
-  //     const courier = await courierFactory();
-  //
-  //     const res = await chai
-  //       .request(app)
-  //       .put(`${resourceEndpoint}/${courier.id}`)
-  //       .send({});
-  //     expect(res).to.have.status(422);
-  //     expect(res.body.errors.length).to.equal(10)
-  //   });
-  //
-  //   it('should get email validation errors', async () => {
-  //     const courier1 = await courierFactory();
-  //     const courier2 = await courierFactory();
-  //
-  //     const res = await chai
-  //       .request(app)
-  //       .put(`${resourceEndpoint}/${courier1.id}`)
-  //       .send({
-  //         name,
-  //         email: courier2.email,
-  //         currentDistrict: DISTRICTS.HOLOSIIVSKYI,
-  //         phone,
-  //         status
-  //       });
-  //     expect(res).to.have.status(422);
-  //     expect(res.body.errors.length).to.equal(1)
-  //   });
-  //
-  //   it('should not found courier', async () => {
-  //     const courier = await courierFactory();
-  //
-  //     const res = await chai
-  //       .request(app)
-  //       .put(`${resourceEndpoint}/${courier.id+1}`)
-  //       .send({
-  //         name,
-  //         email,
-  //         currentDistrict: DISTRICTS.HOLOSIIVSKYI,
-  //         phone,
-  //         status
-  //       });
-  //     expect(res).to.have.status(404);
-  //   });
-  // })
-  //
-  // describe('delete', () => {
-  //   it('should delete courier', async () => {
-  //     const courier = await courierFactory();
-  //
-  //     const res = await chai
-  //       .request(app)
-  //       .delete(`${resourceEndpoint}/${courier.id}`)
-  //       .send();
-  //
-  //     const total = await Courier.count();
-  //     expect(res).to.have.status(204);
-  //     expect(total).to.equal(0)
-  //   });
-  //
-  //   it('should get validation error', async () => {
-  //     const res = await chai
-  //       .request(app)
-  //       .delete(`${resourceEndpoint}/stringId`)
-  //       .send();
-  //
-  //     expect(res).to.have.status(422);
-  //   });
-  //
-  //   it('should not found courier', async () => {
-  //     const courier = await courierFactory();
-  //
-  //     const res = await chai
-  //       .request(app)
-  //       .delete(`${resourceEndpoint}/${courier.id+1}`)
-  //       .send();
-  //
-  //     const total = await Courier.count();
-  //     expect(res).to.have.status(404);
-  //     expect(total).to.equal(1)
-  //   });
-  //
-  // });
+  describe('update', () => {
+    const name = faker.name.findName();
+    const email = faker.internet.email();
+    const phone = faker.phone.phoneNumber();
+    const address = faker.address.streetAddress();
+    const district = DISTRICTS.PODILSKYI;
+
+    it('should update customer', async () => {
+      const customer = await customerFactory();
+
+      const res = await chai
+        .request(app)
+        .put(`${resourceEndpoint}/${customer.id}`)
+        .send({
+          name,
+          email,
+          phone,
+          address,
+          district
+        });
+
+      const updatedCustomer = await Customer.findByPk(customer.id);
+      expect(res).to.have.status(200);
+
+      expect(updatedCustomer.name).to.equal(name);
+      expect(updatedCustomer.email).to.equal(email);
+      expect(updatedCustomer.phone).to.equal(phone);
+      expect(updatedCustomer.address).to.equal(address);
+      expect(updatedCustomer.district).to.equals(district);
+    });
+
+    it('should get validation errors', async () => {
+      const customer = await customerFactory();
+
+      const res = await chai
+        .request(app)
+        .put(`${resourceEndpoint}/${customer.id}`)
+        .send({});
+      expect(res).to.have.status(422);
+      expect(res.body.errors.length).to.equal(10)
+    });
+
+    it('should get email validation errors', async () => {
+      const customer1 = await customerFactory();
+      const customer2 = await customerFactory();
+
+      const res = await chai
+        .request(app)
+        .put(`${resourceEndpoint}/${customer1.id}`)
+        .send({
+          name,
+          email: customer2.email,
+          phone,
+          address,
+          district
+        });
+      expect(res).to.have.status(422);
+      expect(res.body.errors.length).to.equal(1)
+    });
+
+    it('should not found customer', async () => {
+      const customer = await customerFactory();
+
+      const res = await chai
+        .request(app)
+        .put(`${resourceEndpoint}/${customer.id+1}`)
+        .send({
+          name,
+          email,
+          phone,
+          address,
+          district
+        });
+      expect(res).to.have.status(404);
+    });
+  })
+
+  describe('delete', () => {
+    it('should delete customer', async () => {
+      const courier = await customerFactory();
+
+      const res = await chai
+        .request(app)
+        .delete(`${resourceEndpoint}/${courier.id}`)
+        .send();
+
+      const total = await Customer.count();
+      expect(res).to.have.status(204);
+      expect(total).to.equal(0)
+    });
+
+    it('should not delete customer', async () => {
+      const restaurant = await restaurantFactory();
+      const customer = await customerFactory();
+      await orderFactory({
+        CustomerId: customer.id,
+        RestaurantId: restaurant.id,
+      });
+
+      const res = await chai
+        .request(app)
+        .delete(`${resourceEndpoint}/${customer.id}`)
+        .send();
+
+      const total = await Customer.count();
+      expect(res).to.have.status(409);
+      expect(total).to.equal(1)
+    });
+
+
+    it('should get validation error', async () => {
+      const res = await chai
+        .request(app)
+        .delete(`${resourceEndpoint}/stringId`)
+        .send();
+
+      expect(res).to.have.status(422);
+    });
+
+    it('should not found courier', async () => {
+      const customer = await customerFactory();
+
+      const res = await chai
+        .request(app)
+        .delete(`${resourceEndpoint}/${customer.id+1}`)
+        .send();
+
+      const total = await Customer.count();
+      expect(res).to.have.status(404);
+      expect(total).to.equal(1)
+    });
+
+  });
 });

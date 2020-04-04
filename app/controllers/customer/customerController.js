@@ -1,4 +1,4 @@
-const { Customer } = require('../../models');
+const { Customer, Order } = require('../../models');
 const { defaultLimit } = require('../../../config/constants');
 const bcrypt = require('bcrypt');
 
@@ -46,11 +46,15 @@ exports.updateAction = async (req, res) => {
 };
 
 exports.deleteAction = async (req, res) => {
-  //todo don't delete customer if he has active delivering delete customer
   const customer = await Customer.findByPk(req.params.id);
   if(!customer) {
     return res.status(404).send();
   }
+
+  if(await Order.count({where: {CustomerId: customer.id}})) {
+    return res.status(409).json({message: "Can't delete customers with orders!"})
+  }
+
   await customer.destroy();
   res.status(204).send();
 };

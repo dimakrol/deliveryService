@@ -1,4 +1,4 @@
-const { Restaurant } = require('../../models');
+const { Restaurant, Order } = require('../../models');
 const { defaultLimit } = require('../../../config/constants');
 
 exports.indexAction = async (req, res) => {
@@ -36,6 +36,10 @@ exports.deleteAction = async (req, res) => {
   const restaurant = await Restaurant.findByPk(req.params.id);
   if(!restaurant) {
     return res.status(404).send();
+  }
+
+  if(await Order.count({where: {RestaurantId: restaurant.id}})) {
+    return res.status(409).json({message: "Can't delete restaurant with orders!"})
   }
   await restaurant.destroy();
   res.status(204).send();
