@@ -67,6 +67,45 @@ describe('customer resource', () => {
     });
   });
 
+  describe('show', () => {
+    it('should get customer', async () => {
+      const {id} = await customerFactory();
+
+      const res = await chai
+        .request(app)
+        .get(`${resourceEndpoint}/${id}`);
+
+      const customer = await Customer.findByPk(id, {raw: true});
+      delete customer.password;
+      customer.createdAt = customer.createdAt.toJSON();
+      customer.updatedAt = customer.updatedAt.toJSON()
+
+      expect(res).to.have.status(200);
+      expect(res.body.data).to.eql(customer)
+    });
+
+    it('should get validation error', async () => {
+      const res = await chai
+        .request(app)
+        .get(`${resourceEndpoint}/stringId`);
+
+      expect(res).to.have.status(422);
+    });
+
+    it('should not found customer', async () => {
+      const customer = await customerFactory();
+
+      const res = await chai
+        .request(app)
+        .delete(`${resourceEndpoint}/${customer.id+1}`)
+        .send();
+
+      const total = await Customer.count();
+      expect(res).to.have.status(404);
+      expect(total).to.equal(1)
+    });
+  });
+
   describe('create', () => {
     const name = faker.name.findName();
     const email = faker.internet.email();

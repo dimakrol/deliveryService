@@ -19,6 +19,19 @@ exports.indexAction = async (req, res) => {
   res.json({data: couriers, total})
 };
 
+exports.showAction = async (req, res) => {
+  const courier = await Courier.findByPk(req.params.id, {
+    attributes: {
+      exclude: ['password']
+    },
+  });
+  if(!courier) {
+    return res.status(404).send();
+  }
+  res.json({data: courier});
+};
+
+
 exports.createAction = async (req, res) => {
   const { name, email, phone, status } = req.body;
   const password = await bcrypt.hash(req.body.password, 10);

@@ -14,6 +14,14 @@ exports.indexAction = async (req, res) => {
   res.json({data: restaurants, total})
 };
 
+exports.showAction = async (req, res) => {
+  const restaurant = await Restaurant.findByPk(req.params.id);
+  if(!restaurant) {
+    return res.status(404).send();
+  }
+  res.json({data: restaurant});
+};
+
 exports.createAction = async (req, res) => {
   const { title, district, address } = req.body;
   const restaurant = await Restaurant.create({title, district, address});

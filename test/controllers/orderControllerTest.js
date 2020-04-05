@@ -72,6 +72,55 @@ describe('order resource', () => {
     });
   });
 
+  describe('show', () => {
+    it('should get order', async () => {
+      const customer = await customerFactory();
+      const restaurant = await restaurantFactory();
+      const {id} = await orderFactory({
+        CustomerId: customer.id,
+        RestaurantId: restaurant.id
+      });
+
+      const res = await chai
+        .request(app)
+        .get(`${resourceEndpoint}/${id}`);
+
+      const order = await Order.findByPk(id, {raw: true});
+      order.createdAt = order.createdAt.toJSON();
+      order.updatedAt = order.updatedAt.toJSON()
+      order.deliveredAt = order.deliveredAt.toJSON()
+
+      expect(res).to.have.status(200);
+      expect(res.body.data).to.eql(order)
+    });
+
+    it('should get validation error', async () => {
+      const res = await chai
+        .request(app)
+        .get(`${resourceEndpoint}/stringId`);
+
+      expect(res).to.have.status(422);
+    });
+
+    it('should not found restaurant', async () => {
+      const customer = await customerFactory();
+      const restaurant = await restaurantFactory();
+      const {id} = await orderFactory({
+        CustomerId: customer.id,
+        RestaurantId: restaurant.id
+      });
+
+      const res = await chai
+        .request(app)
+        .delete(`${resourceEndpoint}/${id+1}`)
+        .send();
+
+      const total = await Order.count();
+      expect(res).to.have.status(404);
+      expect(total).to.equal(1)
+    });
+  });
+
   describe('create', () => {
     const status = ORDER_STATUSES.NEW;
     const district = DISTRICTS.OBOLONSKYI;

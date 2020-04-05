@@ -68,6 +68,44 @@ describe('courier resource', () => {
     });
   });
 
+  describe('show', () => {
+    it('should get courier', async () => {
+      const {id} = await courierFactory();
+
+      const res = await chai
+        .request(app)
+        .get(`${resourceEndpoint}/${id}`);
+      const courier = await Courier.findByPk(id, {raw: true});
+      delete courier.password;
+      courier.createdAt = courier.createdAt.toJSON();
+      courier.updatedAt = courier.updatedAt.toJSON()
+
+      expect(res).to.have.status(200);
+      expect(res.body.data).to.eql(courier)
+    });
+
+    it('should get validation error', async () => {
+      const res = await chai
+        .request(app)
+        .get(`${resourceEndpoint}/stringId`);
+
+      expect(res).to.have.status(422);
+    });
+
+    it('should not found courier', async () => {
+      const courier = await courierFactory();
+
+      const res = await chai
+        .request(app)
+        .delete(`${resourceEndpoint}/${courier.id+1}`)
+        .send();
+
+      const total = await Courier.count();
+      expect(res).to.have.status(404);
+      expect(total).to.equal(1)
+    });
+  });
+
   describe('create', () => {
     const name = faker.name.findName();
     const email = faker.internet.email();

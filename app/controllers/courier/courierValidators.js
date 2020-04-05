@@ -49,6 +49,6 @@ exports.updateValidator = [
   body('currentDistrict').isIn(Object.values(DISTRICTS)).not().isEmpty(),
 ];
 
-exports.deleteValidator = [
+exports.idValidator = [
   check('id').not().isEmpty().isNumeric(),
 ];

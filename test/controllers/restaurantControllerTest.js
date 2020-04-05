@@ -66,6 +66,44 @@ describe('restaurant resource', () => {
     });
   });
 
+  describe('show', () => {
+    it('should get restaurant', async () => {
+      const {id} = await restaurantFactory();
+
+      const res = await chai
+        .request(app)
+        .get(`${resourceEndpoint}/${id}`);
+
+      const restaurant = await Restaurant.findByPk(id, {raw: true});
+      restaurant.createdAt = restaurant.createdAt.toJSON();
+      restaurant.updatedAt = restaurant.updatedAt.toJSON()
+
+      expect(res).to.have.status(200);
+      expect(res.body.data).to.eql(restaurant)
+    });
+
+    it('should get validation error', async () => {
+      const res = await chai
+        .request(app)
+        .get(`${resourceEndpoint}/stringId`);
+
+      expect(res).to.have.status(422);
+    });
+
+    it('should not found restaurant', async () => {
+      const restaurant = await restaurantFactory();
+
+      const res = await chai
+        .request(app)
+        .delete(`${resourceEndpoint}/${restaurant.id+1}`)
+        .send();
+
+      const total = await Restaurant.count();
+      expect(res).to.have.status(404);
+      expect(total).to.equal(1)
+    });
+  });
+
   describe('create', () => {
     const title = faker.company.companyName();
     const district = DISTRICTS.DNIPROVSKYI;

@@ -14,6 +14,14 @@ exports.indexAction = async (req, res) => {
   res.json({data: orders, total})
 };
 
+exports.showAction = async (req, res) => {
+  const order = await Order.findByPk(req.params.id);
+  if(!order) {
+    return res.status(404).send();
+  }
+  res.json({data: order});
+};
+
 exports.createAction = async (req, res) => {
   const { status, district, address, deliveredAt, deliveryCost,
     totalPrice, CustomerId, RestaurantId, CourierId } = req.body;

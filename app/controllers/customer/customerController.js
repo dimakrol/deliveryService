@@ -19,6 +19,18 @@ exports.indexAction = async (req, res) => {
   res.json({data: customers, total})
 };
 
+exports.showAction = async (req, res) => {
+  const customer = await Customer.findByPk(req.params.id, {
+    attributes: {
+      exclude: ['password']
+    },
+  });
+  if(!customer) {
+    return res.status(404).send();
+  }
+  res.json({data: customer});
+};
+
 exports.createAction = async (req, res) => {
   const { name, email, phone, district, address } = req.body;
   const password = await bcrypt.hash(req.body.password, 10);

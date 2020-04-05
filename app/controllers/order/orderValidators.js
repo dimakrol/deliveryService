@@ -49,7 +49,7 @@ exports.updateValidator = [
   }).optional(),
 ];
 
-exports.deleteValidator = [
+exports.idValidator = [
   check('id').not().isEmpty().isNumeric(),
 ];
 
