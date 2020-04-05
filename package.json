@@ -2,8 +2,8 @@
   "name": "deliveryservice",
   "version": "0.1.0",
   "private": true,
-  "engines" : {
-    "node" : ">=12.10.0"
+  "engines": {
+    "node": ">=12.10.0"
   },
   "scripts": {
     "start": "node bin/server.js",
